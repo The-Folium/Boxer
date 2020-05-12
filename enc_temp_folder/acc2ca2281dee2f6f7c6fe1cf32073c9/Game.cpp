@@ -171,6 +171,7 @@ void Game::run()
 									confirmFlag = true;
 									tournament.boxerArray.push_back(newBoxer);
 									++settings.humanPlayerCounter;
+
 									size_t currentNameLength{ newBoxer.getFullName().length() };
 									if (currentNameLength > tournament.maxBoxerNameLength) { tournament.maxBoxerNameLength = currentNameLength; }
 									

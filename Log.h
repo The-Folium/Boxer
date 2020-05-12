@@ -78,8 +78,6 @@ public:
 
 		} while (failFlag);
 
-
-
 		return input;
 	}
 
@@ -101,6 +99,5 @@ public:
 	{
 		std::cout << '\n' << std::string('-', count) << std::endl;
 	}
-
-	
+		
 };

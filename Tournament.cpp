@@ -1,9 +1,9 @@
 #include "Tournament.h"
 
-
 int Tournament::loadBoxers()
 {
 	boxerFile.open(settings.computerPlayersFilePath);
+	maxBoxerNameLength = 0;
 	if (boxerFile.good())
 	{
 		Boxer boxer;
@@ -12,6 +12,9 @@ int Tournament::loadBoxers()
 		{
 			boxer.isHumanPlayer = false;
 			boxerArray.push_back(boxer);
+			size_t currentNameLength{ boxer.getFullName().length() };
+			if (currentNameLength > maxBoxerNameLength) { maxBoxerNameLength = currentNameLength; }
+
 		}
 		boxerFile.close();
 		settings.isBoxerFileValid = true;
@@ -39,6 +42,7 @@ void Tournament::conduct()
 		round();
 		groupSize >>= 1;
 	}
+	showArrayState();
 }
 
 void Tournament::addHumanPlayer(Boxer boxer)
@@ -48,9 +52,11 @@ void Tournament::addHumanPlayer(Boxer boxer)
 
 void Tournament::showArrayState()
 {
+	Log.toConsole("Total Tournament Ranking\n------------------------\nPlace   Boxer \n-----   -----\n");
 	for (size_t i{ 0 }; i < boxerArray.size(); ++i)
 	{
-		Log.toConsole(boxerArray[i].name + " < ");
+		std::string place{ std::to_string(i+1) };
+		Log.toConsole(place + " : \t" + boxerArray[i].getFullName() + std::string(maxBoxerNameLength - boxerArray[i].getFullName().length() + 5,' ') + " \t" + std::to_string(boxerArray[i].age) + " y.o.\n");
 	}
 	Log.nextLineToConsole();
 }
@@ -107,6 +113,8 @@ void Tournament::deleteBoxer(size_t index)
 	if (boxerArray[index].isHumanPlayer) { --settings.humanPlayerCounter; }
 	boxerArray.erase(boxerArray.begin() + index);
 }
+
+
 
 void Tournament::kick(Boxer& whoKicks, Boxer& whoGets)
 {
@@ -197,9 +205,9 @@ void Tournament::round()
 			Boxer& boxer1{ boxerArray[left_index] };
 			Boxer& boxer2{ boxerArray[right_index] };
 			Log.toConsole(boxer1.getFullName() + "  VS  " + boxer2.getFullName() + " : \n");
-			if (fight(boxer1, boxer2)) //fight is true if left boxer wins
+			if (!fight(boxer1, boxer2)) //fight is true if first boxer wins and we don't swap elements in this case
 			{
-				std::swap(boxer1, boxer2);
+				std::swap(boxer1, boxer2); 
 			}
 						
 			++left_index;

@@ -7,7 +7,6 @@ class Game
 {
 	Tournament tournament;
 	
-
 public:
 	
 	void run();

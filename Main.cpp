@@ -1,4 +1,3 @@
-
 #include <utility>
 #include <string>
 #include "Tournament.h"

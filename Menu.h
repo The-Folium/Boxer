@@ -5,7 +5,6 @@
 #include <algorithm>
 #include "Log.h"
 
-
 class Menu
 {
 	std::string menuName;

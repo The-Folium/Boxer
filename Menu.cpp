@@ -31,8 +31,5 @@ int Menu::askOption()
 	Log.nextLineToConsole();
 
 	return Log.inputInt("Enter [1.." + std::to_string(options.size()) + "]: ",std::make_pair(1, options.size()));
-		
-	
+			
 }
-
-

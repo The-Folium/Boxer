@@ -30,6 +30,8 @@ public:
 	std::pair<unsigned int, unsigned int> correction();
 	void showPlayerList();
 	void deleteBoxer(size_t index);
+	size_t maxBoxerNameLength{ 0 };
+	
 public: //MAKE THIS PRIVATE
 	void kick(Boxer& whoKicks, Boxer& whoGets);
 	bool fight(Boxer& boxer1, Boxer& boxer2);
