@@ -2,6 +2,7 @@
 #include <string>
 
 struct Settings
+//holds all data we want to freely access everywhere
 {
 	enum DifficultyLevel
 	{
@@ -15,6 +16,8 @@ struct Settings
 	bool isBoxerFileValid{ false };
 	bool needReload{ true };
 	bool humanIsFighting{ false };
+
+	size_t maxBoxerNameLength{ 0 };	//keeps track of the longest boxer name. it is used in formatting
 
 	std::string computerPlayersFilePath{ "boxers.txt" };
 	std::string logFilePath{ "log.txt" };

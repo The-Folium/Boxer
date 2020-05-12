@@ -11,8 +11,8 @@ class Menu
 	std::vector<std::string> options;
 
 public:
-	Menu(std::string name);
-	void addOption(std::string option_caption);
+	Menu(const std::string& name);
+	void addOption(const std::string& option_caption);
 	int askOption();
 
 private:
@@ -20,4 +20,6 @@ private:
 	{
 		return option1.length() < option2.length();
 	}
+
+	size_t getMenuWidth();
 };

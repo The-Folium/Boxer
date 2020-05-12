@@ -22,19 +22,18 @@ public:
 public:	
 	
 	int loadBoxers();
-	void conduct();
-	void addHumanPlayer(Boxer boxer);
-	void showArrayState();
-	int getComputerPlayerCount();
-	bool isNaturalPowerOf2();
-	std::pair<unsigned int, unsigned int> correction();
-	void showPlayerList();
-	void deleteBoxer(size_t index);
-	size_t maxBoxerNameLength{ 0 };
-	
-public: //MAKE THIS PRIVATE
+	void conduct();//runs tournament;
+	void addHumanPlayer(const Boxer& boxer);
+	void printRankTable(unsigned char logFlag);	//prints to log current boxerArray state
+	bool isNaturalPowerOf2();	//tests whether we've got valid nuber of boxers or not
+	std::pair<unsigned int, unsigned int> correction();	//yields how many boxers we have to add/delete to rich appropriate number of competitors
+	void showPlayerList();	//prints to log current player list
+	void deleteBoxer(size_t index);	
+	size_t getBoxerNumber();		//just returns boxerArray.size(). 	
+	void resetWins();
+
+private:
 	void kick(Boxer& whoKicks, Boxer& whoGets);
-	bool fight(Boxer& boxer1, Boxer& boxer2);
-	
-	void round();
+	bool fight(Boxer& boxer1, Boxer& boxer2);	
+	void round();	
 };

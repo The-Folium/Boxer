@@ -11,46 +11,50 @@ class Logger
 	std::ofstream logFile;
 
 public:
-	Logger(std::string path) : logPath{ path }
+	static constexpr unsigned char CONSOLE{ 0b0000'0001 };
+	static constexpr unsigned char FILE{ 0b0000'0010 };
+		
+		
+	void saveLog()
+	{		
+		logFile.close();		
+	}
+
+	void newLogFile(const std::string& path)
 	{
+		if (logFile.is_open()) { logFile.close(); }
 		logFile.open(path);
 	}
 
-	~Logger()
+	void print(unsigned char logFlag, const std::string& text)
 	{
-		logFile.close();
+		if (logFlag & CONSOLE){ std::cout << text; }
+		if (logFlag & FILE) { logFile << text; }
 	}
 
-	void newLogFile(std::string path)
-	{
-		logFile.close();
-		logFile.open(path);
-	}
-
-	void toConsole(std::string text)
-	{
-		std::cout << text;
-	}
-
-	void nextLineToConsole(int count = 1)
+	void nextLine(unsigned char logFlag, int count = 1)
 	{
 		for (int i{ 0 }; i < count; ++i)
 		{
-			std::cout << std::endl;
+			print(logFlag, "\n");
 		}
 	}
-
-	void nextLineToFile()
-	{
-		logFile << '\n';
-	}
-
-	void toFile(std::string text)
-	{
-		logFile << text;
-	}
 		
-	int inputInt(std::string text, std::pair<int, int> limits)
+	void header(unsigned char logFlag, const std::string& text, const char ch)
+	{
+		std::string dash(text.length(), ch);
+		if (logFlag & CONSOLE) { std::cout << text << '\n' << dash << '\n'; }
+		if (logFlag & FILE) { logFile << text << '\n' << dash << '\n'; }
+	}
+
+	void wait()
+	{
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		std::cin.get();
+	}
+
+	int inputInt(const std::string& text, std::pair<int, int> limits)
 	{
 		int input{1};		
 		std::cin.clear();
@@ -59,9 +63,9 @@ public:
 		{			
 			if (failFlag)
 			{
-				toConsole("Incorrect input. Try again.\n");
+				print(CONSOLE, "Incorrect input. Try again.\n");
 			}
-			toConsole(text);
+			print(CONSOLE, text);
 			std::cin.clear();
 			std::string str_input{};
 			std::cin >> str_input;
@@ -81,7 +85,7 @@ public:
 		return input;
 	}
 
-	std::string inputString(std::string text)
+	std::string inputString(const std::string& text)
 	{
 		std::string input{};
 		do
@@ -94,10 +98,4 @@ public:
 
 		return input;
 	}
-
-	void dash(int count)
-	{
-		std::cout << '\n' << std::string('-', count) << std::endl;
-	}
-		
 };

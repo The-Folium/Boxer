@@ -1,4 +1,5 @@
 #include "Game.h"
+
 enum MainMenuOption
 {
 	START = 1, DIFFICULTY, BOXER_FILE, LOG_FILE, ADD_HUMAN, DELETE_PLAYER, SOUND, EXIT
@@ -14,28 +15,32 @@ enum CreateMenuOption
 	NAME = 1, LAST_NAME, AGE, CONFIRM, CANCEL
 };
 
-
-
 void Game::run()
 {
 	std::string boxerFileComment{};
 	int boxerFileState{};	
-	while (true)
+	bool gameProceeds{ true };
+	while (gameProceeds)
 	{
-		Log.nextLineToConsole(2);		
+		
+		Log.nextLine(Logger::CONSOLE, 2);		
 		Menu mainMenu("MAIN MENU");
 		
 		if (settings.needReload) 
 		{ 
 			boxerFileState = tournament.loadBoxers();			
-			if (boxerFileState == -1) { boxerFileComment = "File Not Found"; }
+			if (boxerFileState == -1) { boxerFileComment = "File Not Found Or Corrupted"; }
 			else { boxerFileComment = std::to_string(boxerFileState) + " computer boxers loaded"; }
 			settings.needReload = false;
 		}
 
+		Log.header(Logger::CONSOLE, "Current Player List", '=');
+		tournament.showPlayerList();
+		Log.nextLine(Logger::CONSOLE);
+
 		std::string tournamentStateComment;
 		bool isReady{ true };
-		if (settings.humanPlayerCounter + tournament.getComputerPlayerCount() < 2) { tournamentStateComment = "Need more players"; isReady = false; }
+		if (settings.humanPlayerCounter + tournament.getBoxerNumber() < 2) { tournamentStateComment = "Need more players"; isReady = false; }
 		if (!tournament.isNaturalPowerOf2())
 		{
 			auto correction {tournament.correction()};			
@@ -46,7 +51,6 @@ void Game::run()
 			tournamentStateComment = "We have " + std::to_string(tournament.boxerArray.size()) + " boxers!";
 		}
 		std::string readyStatusComment{ isReady ? "READY" : "ERROR:" };
-
 		std::string soundStateComment{ settings.soundFlag ? "ON" : "OFF" };
 
 		mainMenu.addOption("Start Tournament      " + readyStatusComment + "  " + tournamentStateComment);
@@ -117,12 +121,12 @@ void Game::run()
 								Boxer& currentBoxer{ tournament.boxerArray[newHumanIndex-1] };
 								if (currentBoxer.isHumanPlayer)
 								{
-									Log.toConsole("Sorry, " + currentBoxer.getFullName() + " is a human Player already. Please, try another one.");
+									Log.print(Logger::CONSOLE,"Sorry, " + currentBoxer.getFullName() + " is a human Player already. Please, try another one.\n");
 								}
 								else
 								{
 									currentBoxer.makeHuman();
-									Log.toConsole(currentBoxer.getFullName() + " is a NEW human Player now!");
+									Log.print(Logger::CONSOLE,currentBoxer.getFullName() + " is a NEW human Player now!\n");
 									++settings.humanPlayerCounter;
 									choiceMade = true;
 								}								
@@ -162,7 +166,7 @@ void Game::run()
 								}
 								case(AGE):
 								{
-									int newAge{ Log.inputInt("[0 - to return, 1..99 - ]: ",	std::make_pair(0, 99)) };
+									int newAge{ Log.inputInt("[0 - to return, 1..99 - to select]: ",	std::make_pair(0, 99)) };
 									if (newAge) { newBoxer.age = newAge; }
 									break;
 								}
@@ -172,9 +176,9 @@ void Game::run()
 									tournament.boxerArray.push_back(newBoxer);
 									++settings.humanPlayerCounter;
 									size_t currentNameLength{ newBoxer.getFullName().length() };
-									if (currentNameLength > tournament.maxBoxerNameLength) { tournament.maxBoxerNameLength = currentNameLength; }
+									if (currentNameLength > settings.maxBoxerNameLength) { settings.maxBoxerNameLength = currentNameLength; }
 									
-									Log.toConsole(newBoxer.getFullName() + " is a NEW human Player now!");
+									Log.print(Logger::CONSOLE,newBoxer.getFullName() + " is a NEW human Player now!");
 									break;
 								}
 								default: break;
@@ -189,13 +193,14 @@ void Game::run()
 
 			case (DELETE_PLAYER):
 			{
+				Log.nextLine(Logger::CONSOLE);
 				tournament.showPlayerList();
 				
-				int deletePlayerIndex{ Log.inputInt("[0 - to return, 1.." + std::to_string(tournament.boxerArray.size()) + " - to choose your character]: ",
+				int deletePlayerIndex{ Log.inputInt("[0 - to return, 1.." + std::to_string(tournament.boxerArray.size()) + " - to a boxer to delete]: ",
 													std::make_pair(0, tournament.boxerArray.size())) };
 				if (deletePlayerIndex)
 				{
-						Log.toConsole(tournament.boxerArray[deletePlayerIndex-1].getFullName() + " has been deleted!");
+						Log.print(Logger::CONSOLE,tournament.boxerArray[deletePlayerIndex-1].getFullName() + " has been deleted!");
 						tournament.deleteBoxer(deletePlayerIndex-1);											
 				}			
 				
@@ -210,7 +215,7 @@ void Game::run()
 
 			default:
 			{
-				break;
+				gameProceeds = false;
 			}
 		}
 	}

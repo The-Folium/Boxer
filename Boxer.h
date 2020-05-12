@@ -16,7 +16,8 @@ public:
 	std::string name;
 	std::string last_name;
 	unsigned int age;
-	bool isHumanPlayer{ false };
+	int wins{ 0 };
+	bool isHumanPlayer;
 	static std::mt19937 mersenne;
 
 private:
@@ -25,17 +26,18 @@ private:
 	BodyPart protectingZone;
 
 public:
-	Boxer(std::string name_init, std::string last_name_init, unsigned int age__init, bool isHuman);
+	Boxer(const std::string& name_init,const std::string& last_name_init, unsigned int age__init, bool isHuman);
 	Boxer();
 	int getRandom(int min, int max);
-	BodyPart generateBodyPart(std::string prompt = "");
+	BodyPart generateBodyPart(const std::string& prompt = "");
 	bool isAlive();
 	BodyPart getTarget();
 	void setTarget(BodyPart part);
 	BodyPart getProtectingZone();
 	void setProtectingZone(BodyPart part);
-	std::string getFullName();
+	std::string getFullName(bool aligned = false);	
 	void printStatus();
 	void makeHuman();
+	
 	
 };
