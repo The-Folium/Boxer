@@ -33,6 +33,7 @@ void Tournament::conduct()
 	while (groupSize > 1)
 	{
 		++roundCounter;
+		Log.nextLineToConsole();
 		Log.toConsole("Round " + std::to_string(roundCounter) + "      Group size: " + std::to_string(groupSize) + '\n');
 
 		round();
@@ -119,18 +120,21 @@ void Tournament::kick(Boxer& whoKicks, Boxer& whoGets)
 	//displaying results
 	if (damage == 0)
 	{
-		Log.toConsole("Punch has been blocked!\n");
+		if(settings.humanIsFighting) Log.toConsole("Punch has been blocked!\n");
 	}
 	else
 	{
-		Log.toConsole("Punch successful! " + whoGets.getFullName() + " lost " + std::to_string(damage) + " HP.\n");
+		if (settings.humanIsFighting) Log.toConsole("Punch successful! " + whoGets.getFullName() + " lost " + std::to_string(damage) + " HP.\n");
 	}
 }
 
 bool Tournament::fight(Boxer& boxer1, Boxer& boxer2)
 {
-	if (settings.soundFlag) { PlaySound(TEXT("bell.wav"), NULL, SND_FILENAME | SND_ASYNC); }
-
+	settings.humanIsFighting = false;
+	if (boxer1.isHumanPlayer || boxer2.isHumanPlayer) { settings.humanIsFighting = true; }
+	if (settings.soundFlag && settings.humanIsFighting) { PlaySound(TEXT("bell.wav"), NULL, SND_FILENAME | SND_ASYNC); }
+	
+	
 	Boxer* p_boxer1{ &boxer1 };
 	Boxer* p_boxer2{ &boxer2 };
 	bool Boxer1Wins{ true };
@@ -138,11 +142,12 @@ bool Tournament::fight(Boxer& boxer1, Boxer& boxer2)
 	{
 		
 		p_boxer1->setTarget(p_boxer1->generateBodyPart("Where wanna punch your opponent?\n"));
-		Log.toConsole(p_boxer1->getFullName() + " is about to punch " + p_boxer2->getFullName() +
-				" in his " + bodyPartToString(p_boxer1->getTarget()));
+		if (settings.humanIsFighting) Log.toConsole(p_boxer1->getFullName() + " is about to punch " + p_boxer2->getFullName() +
+				" in his " + bodyPartToString(p_boxer1->getTarget()) + '\n');
+		
 		
 		p_boxer2->setProtectingZone(p_boxer2->generateBodyPart("Which bodypart do you wanna protect?\n"));
-		Log.toConsole(p_boxer2->getFullName() + " protects his " + bodyPartToString(p_boxer2->getProtectingZone()));
+		if (settings.humanIsFighting) Log.toConsole(p_boxer2->getFullName() + " protects his " + bodyPartToString(p_boxer2->getProtectingZone()) + '\n');
 		
 		
 		kick(*p_boxer1, *p_boxer2);
@@ -152,13 +157,17 @@ bool Tournament::fight(Boxer& boxer1, Boxer& boxer2)
 			p_boxer1->hp = p_boxer2->hp = 100; //restoring hp after fight;
 			return (Boxer1Wins);			
 		}
-		p_boxer1->printStatus();
-		p_boxer2->printStatus();
+
+		if (settings.humanIsFighting)
+		{
+			p_boxer1->printStatus();
+			p_boxer2->printStatus();
+		}
+
 		Boxer1Wins = !Boxer1Wins;
 		
 		std::swap(p_boxer1, p_boxer2);
-		std::cin.clear();
-		std::cin.get();
+		
 	}	
 
 }
@@ -166,22 +175,40 @@ bool Tournament::fight(Boxer& boxer1, Boxer& boxer2)
 
 void Tournament::round()
 {
+	
 	const size_t groupNumber{ boxerArray.size() / groupSize };
 	for (unsigned int groupCounter{ 0 }; groupCounter < groupNumber; ++groupCounter)
 	{
+		Log.toConsole("Group " + std::to_string(groupCounter + 1) + ": ");
+		
 		size_t left_index{ groupCounter * groupSize };
 		size_t right_index{ left_index + groupSize - 1 };
 
+		std::string groupEnumeration{};
+		for (size_t index{ left_index }; index <= right_index; ++index)
+		{
+			char separator{ (index == right_index) ? ' ' : ',' };
+			groupEnumeration += (boxerArray[index].name + separator + ' ') ;			
+		}
+		Log.toConsole(groupEnumeration + '\n');
+
 		while (left_index < right_index)
 		{
-			if (fight(boxerArray[left_index], boxerArray[right_index])) //fight is true if left boxer wins
+			Boxer& boxer1{ boxerArray[left_index] };
+			Boxer& boxer2{ boxerArray[right_index] };
+			Log.toConsole(boxer1.getFullName() + "  VS  " + boxer2.getFullName() + " : \n");
+			if (fight(boxer1, boxer2)) //fight is true if left boxer wins
 			{
-				std::swap(boxerArray[left_index], boxerArray[right_index]);
+				std::swap(boxer1, boxer2);
 			}
+						
 			++left_index;
 			--right_index;
+
 		}
-		Log.toConsole(std::to_string(groupCounter) + ":");
-		showArrayState();
+		
 	}
+	
+	std::cin.clear();
+	std::cin.get();
 }

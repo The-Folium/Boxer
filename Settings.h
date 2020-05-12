@@ -14,6 +14,8 @@ struct Settings
 
 	bool isBoxerFileValid{ false };
 	bool needReload{ true };
+	bool humanIsFighting{ false };
+
 
 	std::string computerPlayersFilePath{ "boxers.txt" };
 	std::string logFilePath{ "log.txt" };

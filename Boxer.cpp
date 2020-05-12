@@ -8,8 +8,7 @@ Boxer::Boxer(std::string name_init, std::string last_name_init, unsigned int age
 	isHumanPlayer{ isHuman },
 	hp{ 100 },
 	target{BodyPart::NONE},
-	protectingZone{ BodyPart::NONE }
-	
+	protectingZone{ BodyPart::NONE }	
 {
 }
 
@@ -93,7 +92,7 @@ void Boxer::printStatus()
 	else if (hp > 20) { conclusion = "Furious but weakening."; }
 	else if (hp > 10) { conclusion = "Highly severe injuries."; }
 	else if (hp > 0) { conclusion = "Death is near..."; }
-	Log.toConsole(getFullName() + "'s HP: " + std::to_string(hp) + "   " + conclusion);
+	Log.toConsole(getFullName() + "'s HP: " + std::to_string(hp) + "   " + conclusion + '\n');
 }
 
 void Boxer::makeHuman()
